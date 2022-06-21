@@ -1,7 +1,6 @@
 from enum import Enum
 
 import graphene
-
 from saleor.graphql.core.types.common import Error
 
 

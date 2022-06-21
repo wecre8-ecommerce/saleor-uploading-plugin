@@ -16,15 +16,10 @@ from saleor.core.utils.validators import get_oembed_data
 from saleor.graphql.channel import ChannelContext
 from saleor.graphql.core.mutations import BaseMutation
 from saleor.graphql.core.types.common import Error
-from saleor.graphql.product.types import Product
-from saleor.product import ProductMediaTypes
 from saleor.product.thumbnails import create_product_thumbnails
-
-from uploading.graphql.enums import (
-    PreSignedErrorCodeType,
-    ProductExtendClassErrorCode,
-    ProductExtendError,
-)
+from uploading.graphql.enums import (PreSignedErrorCodeType,
+                                     ProductExtendClassErrorCode,
+                                     ProductExtendError)
 
 logger = logging.getLogger(__name__)
 
@@ -128,8 +123,7 @@ class ProductMediaCreateInputExtended(graphene.InputObjectType):
 
 
 class ProductMediaCreateExtended(BaseMutation):
-    # product_extend = graphene.Field(ProductExtended)
-    ok = graphene.Boolean()
+    is_uploaded = graphene.Boolean()
 
     class Arguments:
         input = ProductMediaCreateInputExtended(
@@ -143,7 +137,6 @@ class ProductMediaCreateExtended(BaseMutation):
         )
         # permissions = (ProductPermissions.MANAGE_PRODUCTS,)
         error_type_class = ProductExtendError
-        error_type_field = "product_errors"
 
     @classmethod
     def validate_input(cls, data):
@@ -164,11 +157,8 @@ class ProductMediaCreateExtended(BaseMutation):
         data = data.get("input")
         cls.validate_input(data)
         product = cls.get_node_or_error(
-            info,
-            data["product_extend"],
-            only_type=Product,
+            info, data["product_extend"], only_type="Product"
         )
-        print(product)
         alt = data.get("alt", "")
         media_url = data.get("media_url")
 
@@ -181,7 +171,7 @@ class ProductMediaCreateExtended(BaseMutation):
                 media = product.media.create(
                     image=image_file,
                     alt=alt,
-                    type=ProductMediaTypes.IMAGE,
+                    type="IMAGE",
                 )
                 create_product_thumbnails.delay(media.pk)
             else:
@@ -195,6 +185,6 @@ class ProductMediaCreateExtended(BaseMutation):
 
         product = ChannelContext(node=product, channel_slug=None)
         if product:
-            return ProductMediaCreateExtended(ok=True)
+            return ProductMediaCreateExtended(is_uploaded=True)
         else:
-            return ProductMediaCreateExtended(ok=False)
+            return ProductMediaCreateExtended(is_uploaded=False)
