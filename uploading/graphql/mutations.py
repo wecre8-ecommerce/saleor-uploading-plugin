@@ -12,15 +12,14 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File
-
-from saleor.graphql.channel import ChannelContext
-from saleor.graphql.product.types import Product
-
 from saleor.core.utils.validators import get_oembed_data
+from saleor.graphql.channel import ChannelContext
 from saleor.graphql.core.mutations import BaseMutation
 from saleor.graphql.core.types.common import Error
+from saleor.graphql.product.types import Product
 from saleor.product import ProductMediaTypes
 from saleor.product.thumbnails import create_product_thumbnails
+
 from uploading.graphql.enums import (
     PreSignedErrorCodeType,
     ProductExtendClassErrorCode,
